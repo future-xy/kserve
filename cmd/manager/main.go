@@ -17,7 +17,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
+	"time"
 
 	"github.com/kserve/kserve/pkg/apis/serving/v1alpha1"
 	"github.com/kserve/kserve/pkg/apis/serving/v1beta1"
@@ -72,6 +74,7 @@ func main() {
 	logf.SetLogger(zap.New())
 	log := logf.Log.WithName("entrypoint")
 
+	start := time.Now()
 	// Get a config to talk to the apiserver
 	log.Info("Setting up client for manager")
 	cfg, err := config.GetConfig()
@@ -219,4 +222,7 @@ func main() {
 		log.Error(err, "unable to run the manager")
 		os.Exit(1)
 	}
+
+	logMsg := fmt.Sprintf("MAINTime=%d", time.Since(start))
+	log.Info(logMsg)
 }

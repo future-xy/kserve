@@ -18,6 +18,7 @@ package components
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/kserve/kserve/pkg/constants"
@@ -74,6 +75,8 @@ func (p *Predictor) Reconcile(isvc *v1beta1.InferenceService) (ctrl.Result, erro
 	addStorageSpecAnnotations(isvc.Spec.Predictor.GetImplementation().GetStorageSpec(), annotations)
 	// Add agent annotations so mutator will mount model agent to multi-model InferenceService's predictor
 	addAgentAnnotations(isvc, annotations, p.inferenceServiceConfig)
+
+	start := time.Now()
 
 	// Reconcile modelConfig
 	configMapReconciler := modelconfig.NewModelConfigReconciler(p.client, p.scheme)
@@ -298,6 +301,9 @@ func (p *Predictor) Reconcile(isvc *v1beta1.InferenceService) (ctrl.Result, erro
 		return ctrl.Result{}, errors.Wrapf(err, "fails to list inferenceservice pods by label")
 	}
 	isvc.Status.PropagateModelStatus(statusSpec, podList, rawDeployment)
+
+	logMsg := fmt.Sprintf("PRETIME=%d", time.Since(start))
+	p.Log.Info(logMsg)
 
 	return ctrl.Result{}, nil
 }
