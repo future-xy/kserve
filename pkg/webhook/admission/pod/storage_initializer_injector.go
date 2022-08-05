@@ -82,6 +82,7 @@ func getStorageInitializerConfigs(configMap *v1.ConfigMap) (*StorageInitializerC
 // a provisioning INIT container. This is a work around because KNative does not
 // support INIT containers: https://github.com/knative/serving/issues/4307
 func (mi *StorageInitializerInjector) InjectStorageInitializer(pod *v1.Pod) error {
+	log.Info("SIINIT")
 	// Only inject if the required annotations are set
 	srcURI, ok := pod.ObjectMeta.Annotations[constants.StorageInitializerSourceUriInternalAnnotationKey]
 	if !ok {
@@ -251,6 +252,7 @@ func (mi *StorageInitializerInjector) InjectStorageInitializer(pod *v1.Pod) erro
 
 	// Add init container to the spec
 	pod.Spec.InitContainers = append(pod.Spec.InitContainers, *initContainer)
+	log.Info("SIFINISH")
 
 	return nil
 }

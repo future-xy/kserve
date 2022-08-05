@@ -17,10 +17,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"os"
-	"time"
-
 	"github.com/kserve/kserve/pkg/apis/serving/v1alpha1"
 	"github.com/kserve/kserve/pkg/apis/serving/v1beta1"
 	"github.com/kserve/kserve/pkg/constants"
@@ -38,6 +34,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/tools/record"
 	knservingv1 "knative.dev/serving/pkg/apis/serving/v1"
+	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
@@ -74,9 +71,9 @@ func main() {
 	logf.SetLogger(zap.New())
 	log := logf.Log.WithName("entrypoint")
 
-	start := time.Now()
 	// Get a config to talk to the apiserver
 	log.Info("Setting up client for manager")
+	log.Info("Working on it!!!")
 	cfg, err := config.GetConfig()
 	if err != nil {
 		log.Error(err, "unable to set up client config")
@@ -223,6 +220,4 @@ func main() {
 		os.Exit(1)
 	}
 
-	logMsg := fmt.Sprintf("MAINTime=%d", time.Since(start))
-	log.Info(logMsg)
 }

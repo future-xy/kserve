@@ -18,7 +18,9 @@ package pod
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 
 	v1 "k8s.io/api/core/v1"
 	k8types "k8s.io/apimachinery/pkg/types"
@@ -42,6 +44,8 @@ type Mutator struct {
 // Handle decodes the incoming Pod and executes mutation logic.
 func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admission.Response {
 	pod := &v1.Pod{}
+	log.Info("START MUTATING")
+	start := time.Now()
 
 	if err := mutator.Decoder.Decode(req, pod); err != nil {
 		log.Error(err, "Failed to decode pod", "name", pod.Labels[constants.InferenceServicePodLabelKey])
@@ -52,6 +56,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 		return admission.ValidationResponse(true, "")
 	}
 
+	log.Info("MUTATING")
 	configMap := &v1.ConfigMap{}
 	err := mutator.Client.Get(context.TODO(), k8types.NamespacedName{Name: constants.InferenceServiceConfigMapName, Namespace: constants.KServeNamespace}, configMap)
 	if err != nil {
@@ -72,6 +77,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 		log.Error(err, "Failed to marshal pod", "name", pod.Labels[constants.InferenceServicePodLabelKey])
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
+	log.Info(fmt.Sprintf("MTTime=%d", time.Since(start)/time.Millisecond))
 
 	return admission.PatchResponseFromRaw(req.AdmissionRequest.Object.Raw, patch)
 }

@@ -130,6 +130,7 @@ func (p *Predictor) Reconcile(isvc *v1beta1.InferenceService) (ctrl.Result, erro
 			}
 
 			sRuntime = *r
+			p.Log.Info("PREIF")
 		} else {
 			runtimes, err := isvc.Spec.Predictor.Model.GetSupportingRuntimes(p.client, isvc.Namespace, false)
 			if err != nil {
@@ -148,6 +149,7 @@ func (p *Predictor) Reconcile(isvc *v1beta1.InferenceService) (ctrl.Result, erro
 
 			// set runtime defaults
 			isvc.SetRuntimeDefaults()
+			p.Log.Info("PREELSE")
 		}
 		// assign protocol version to inferenceservice based on runtime selected
 		if isvc.Spec.Predictor.Model.ProtocolVersion == nil {
@@ -204,8 +206,9 @@ func (p *Predictor) Reconcile(isvc *v1beta1.InferenceService) (ctrl.Result, erro
 		podSpec.Containers = []v1.Container{
 			*container,
 		}
-
+		p.Log.Info("PRENOTNIL")
 	} else {
+		p.Log.Info("PRENIL")
 		container = predictor.GetContainer(isvc.ObjectMeta, isvc.Spec.Predictor.GetExtensions(), p.inferenceServiceConfig)
 
 		podSpec = v1.PodSpec(isvc.Spec.Predictor.PodSpec)
@@ -302,7 +305,7 @@ func (p *Predictor) Reconcile(isvc *v1beta1.InferenceService) (ctrl.Result, erro
 	}
 	isvc.Status.PropagateModelStatus(statusSpec, podList, rawDeployment)
 
-	logMsg := fmt.Sprintf("PRETIME=%d", time.Since(start))
+	logMsg := fmt.Sprintf("PRETIME=%d", time.Since(start)/time.Millisecond)
 	p.Log.Info(logMsg)
 
 	return ctrl.Result{}, nil
