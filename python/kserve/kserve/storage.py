@@ -152,7 +152,7 @@ class Storage(object):  # pylint: disable=too-few-public-methods
         # 2. Environment variables
         # 3. ~/.aws/config file
         s3 = boto3.resource('s3',
-                            endpoint_url=os.getenv("AWS_ENDPOINT_URL", "http://s3.amazonaws.com"),
+                            endpoint_url="http://" + "129.215.164.41:9000",
                             config=Storage.get_S3_config())
         parsed = urlparse(uri, scheme='s3')
         bucket_name = parsed.netloc
